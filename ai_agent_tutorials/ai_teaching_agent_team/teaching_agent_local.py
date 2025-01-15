@@ -1,8 +1,8 @@
-@ -0,0 +1,204 @@
 import streamlit as st
 from phi.agent import Agent, RunResponse
 from phi.model.ollama import Ollama
 from composio_phidata import Action, ComposioToolSet
+import os
 from phi.tools.arxiv_toolkit import ArxivToolkit
 from phi.utils.pprint import pprint_run_response
 from phi.tools.serpapi_tools import SerpApiTools
@@ -10,8 +10,7 @@ from phi.tools.serpapi_tools import SerpApiTools
 # Set page configuration
 st.set_page_config(page_title="👨‍🏫 AI Teaching Agent Team", layout="centered")
 
-
-# Initialize session state without OpenAI key
+# Initialize session state for API keys and topic
 if 'composio_api_key' not in st.session_state:
     st.session_state['composio_api_key'] = ''
 if 'serpapi_api_key' not in st.session_state:
@@ -19,20 +18,22 @@ if 'serpapi_api_key' not in st.session_state:
 if 'topic' not in st.session_state:
     st.session_state['topic'] = ''
 
-# Streamlit sidebar without OpenAI key
+# Streamlit sidebar for API keys
 with st.sidebar:
     st.title("API Keys Configuration")
     st.session_state['composio_api_key'] = st.text_input("Enter your Composio API Key", type="password").strip()
     st.session_state['serpapi_api_key'] = st.text_input("Enter your SerpAPI Key", type="password").strip()
     
-    st.info("Note: You can view detailed agent responses\nin your terminal after execution.")
+    # Add info about terminal responses
+    st.info("Note: You can also view detailed agent responses\nin your terminal after execution.")
 
-# Validate API keys without OpenAI
+# Validate API keys
 if not st.session_state['composio_api_key'] or not st.session_state['serpapi_api_key']:
-    st.error("Please enter Composio and SerpAPI keys in the sidebar.")
+    st.error("Please enter Composio, and SerpAPI keys in the sidebar.")
     st.stop()
 
-# Keep the agents configuration with Ollama model
+# Set the OpenAI API key and Composio API key from session state
+
 try:
     composio_toolset = ComposioToolSet(api_key=st.session_state['composio_api_key'])
     google_docs_tool = composio_toolset.get_tools(actions=[Action.GOOGLEDOCS_CREATE_DOCUMENT])[0]
@@ -45,7 +46,7 @@ except Exception as e:
 professor_agent = Agent(
     name="Professor",
     role="Research and Knowledge Specialist", 
-    model=Ollama(model="phi4:latest"),
+    model=Ollama(model="llama3.1"),
     tools=[google_docs_tool],
     instructions=[
         "Create a comprehensive knowledge base that covers fundamental concepts, advanced topics, and current developments of the given topic.",
@@ -61,7 +62,7 @@ professor_agent = Agent(
 academic_advisor_agent = Agent(
     name="Academic Advisor",
     role="Learning Path Designer",
-    model=Ollama(model="phi4:latest"),
+    model=Ollama(model="llama3.1"),    
     tools=[google_docs_tool],
     instructions=[
         "Using the knowledge base for the given topic, create a detailed learning roadmap.",
@@ -79,7 +80,7 @@ academic_advisor_agent = Agent(
 research_librarian_agent = Agent(
     name="Research Librarian",
     role="Learning Resource Specialist",
-    model=Ollama(model="phi4:latest"),
+    model=Ollama(model="llama3.1"),
     tools=[google_docs_tool, SerpApiTools(api_key=st.session_state['serpapi_api_key']) ],
     instructions=[
         "Make a list of high-quality learning resources for the given topic.",
@@ -96,7 +97,7 @@ research_librarian_agent = Agent(
 teaching_assistant_agent = Agent(
     name="Teaching Assistant",
     role="Exercise Creator",
-    model=Ollama(model="phi4:latest"),
+    model=Ollama(model="llama3.1"),
     tools=[google_docs_tool, SerpApiTools(api_key=st.session_state['serpapi_api_key'])],
     instructions=[
         "Create comprehensive practice materials for the given topic.",

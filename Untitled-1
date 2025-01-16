@@ -1,0 +1,79 @@
+# ... existing imports ...
+
+# Updated title and description
+st.title("University of Oregon AI Grants Researcher 🎓")
+st.caption("Discover AI grant opportunities and funding for curriculum enhancement and student services at UO.")
+
+# Modified input field
+topic = st.text_input("Enter specific AI focus area (e.g., curriculum augmentation, student services):", 
+                      value="Generative AI in higher education curriculum")
+
+# ... existing API key handling ...
+
+                # Updated agent instructions for News Collector
+                news_collector = Agent(
+                    name="Grants Researcher",
+                    role="Researches grant opportunities and AI initiatives in higher education",
+                    tools=[search_tool],
+                    model=anthropic_model,
+                    instructions=[
+                        "Search for recent grant opportunities, funding programs, and successful AI implementations in higher education",
+                        "Focus on opportunities related to University of Oregon and similar institutions",
+                        "Look for grants specifically targeting Generative AI in education"
+                    ],
+                    show_tool_calls=True,
+                    markdown=True,
+                )
+
+                # Updated Summary Writer instructions
+                summary_writer = Agent(
+                    name="Grant Analyzer",
+                    role="Analyzes grant opportunities and requirements",
+                    tools=[news_tool],
+                    model=anthropic_model,
+                    instructions=[
+                        "Analyze grant requirements, deadlines, and funding amounts",
+                        "Focus on opportunities relevant to University of Oregon",
+                        "Highlight specific requirements for AI in education projects"
+                    ],
+                    show_tool_calls=True,
+                    markdown=True,
+                )
+
+                # Updated Trend Analyzer instructions
+                trend_analyzer = Agent(
+                    name="Opportunity Synthesizer",
+                    role="Synthesizes opportunities and provides actionable insights",
+                    model=anthropic_model,
+                    instructions=[
+                        "Identify most promising grant opportunities for UO",
+                        "Suggest specific implementation approaches for different departments",
+                        "Highlight alignment with UO's mission and existing resources"
+                    ],
+                    show_tool_calls=True,
+                    markdown=True,
+                )
+
+                # Updated team instructions
+                agent_team = Agent(
+                    agents=[news_collector, summary_writer, trend_analyzer],
+                    instructions=[
+                        "First, search for grant opportunities related to Generative AI in higher education, focusing on:",
+                        "- Curriculum augmentation grants",
+                        "- Student learning services funding",
+                        "- AI integration in course development",
+                        "- Educational technology innovation grants",
+                        "Then, analyze each opportunity for UO-specific relevance",
+                        "Finally, provide a detailed report organizing opportunities by department, timeline, and funding amount",
+                        "Include specific recommendations for UO implementation"
+                    ],
+                    show_tool_calls=True,
+                    markdown=True,
+                )
+
+                # ... existing execution code ...
+
+                st.subheader("Grant Opportunities and Implementation Recommendations")
+                st.write(analysis)
+
+# ... rest of the error handling code ... 
